@@ -1,0 +1,147 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["jsonProtocol"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_DATABASE_URL")
+}
+
+model MenuItem {
+  id          String     @id @default(cuid())
+  name        String
+  description String
+  price       Float      // Base price (default/small)
+  image       String?
+  category    String
+  ingredients String?    // JSON string of ingredients array
+  allergens   String?    // JSON string of allergens array
+  sizes       String?    // JSON string of available sizes with prices: [{"name":"Small","price":130},...]
+  addOns      AddOn[]
+  orderItems  OrderItem[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([category])
+}
+
+model AddOn {
+  id          String     @id @default(cuid())
+  name        String
+  price       Float
+  menuItem    MenuItem   @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+  menuItemId  String
+  orderAddOns OrderAddOn[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([menuItemId])
+}
+
+model Order {
+  id              String     @id @default(cuid())
+  tableNumber     Int
+  branch          String     @default("Flitra Café")
+  status          OrderStatus @default(PENDING)
+  paymentStatus   PaymentStatus @default(UNPAID)
+  paymentMethod   PaymentMethod?
+  totalAmount     Float
+  orderItems      OrderItem[]
+  paymentCode     String?
+  estimatedTime   Int        @default(15) // in minutes
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  @@index([status])
+  @@index([paymentStatus])
+  @@index([tableNumber])
+  @@index([createdAt])
+}
+
+model OrderItem {
+  id          String     @id @default(cuid())
+  order       Order      @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId     String
+  menuItem    MenuItem   @relation(fields: [menuItemId], references: [id])
+  menuItemId  String
+  quantity    Int
+  size        String?    // Small, Medium, Large
+  sugarLevel  Int        @default(100) // 0, 25, 50, 75, 100
+  addOns      OrderAddOn[]
+  notes       String?    // Special instructions
+  itemTotal   Float
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([orderId])
+  @@index([menuItemId])
+}
+
+model OrderAddOn {
+  id          String     @id @default(cuid())
+  orderItem   OrderItem  @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+  orderItemId String
+  addOn       AddOn      @relation(fields: [addOnId], references: [id])
+  addOnId     String
+  quantity    Int
+
+  @@index([orderItemId])
+  @@index([addOnId])
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PREPARING
+  READY
+  COMPLETED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  UNPAID
+  PAID
+  REFUNDED
+}
+
+enum PaymentMethod {
+  CASH
+  GCASH
+  PAYMAYA
+  CARD
+}
+
+model Staff {
+  id        String   @id @default(cuid())
+  username  String   @unique
+  password  String
+  name      String
+  role      String   @default("BARISTA") // ADMIN, BARISTA, MANAGER
+  email     String?  @unique
+  phone     String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([username])
+  @@index([role])
+}
+
+model Table {
+  id          String   @id @default(cuid())
+  tableNumber Int      @unique
+  qrCode      String   // URL to QR code image
+  qrCodeData  String   // Raw QR code data (includes table number and url)
+  status      String   @default("AVAILABLE") // AVAILABLE, OCCUPIED, RESERVED
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([tableNumber])
+  @@index([status])
+}
+

@@ -1,0 +1,46 @@
+services:
+  - type: web
+    name: g2possystem
+    env: node
+    plan: free
+    runtime: node-22
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /
+    headers:
+      - http:
+          paths:
+            - path: /_next/static/*
+              headers:
+                - key: Cache-Control
+                  value: "public, max-age=31536000, immutable"
+            - path: /_next/image/*
+              headers:
+                - key: Cache-Control
+                  value: "public, max-age=86400"
+    envVars:
+      - key: DATABASE_URL
+        scope: build
+        sync: false
+      - key: DIRECT_DATABASE_URL
+        scope: build
+        sync: false
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
+        value: dtr1tnutd
+      - key: CLOUDINARY_API_KEY
+        scope: build
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        scope: build
+        sync: false
+      - key: NEXT_PUBLIC_GCASH_MERCHANT_ID
+        value: your_merchant_id
+      - key: GCASH_SECRET_KEY
+        scope: build
+        sync: false
+      - key: NEXT_PUBLIC_APP_URL
+        value: https://g2possystem-production-c334.up.railway.app
+      - key: NEXT_PUBLIC_BASE_URL
+        value: https://g2possystem-production-c334.up.railway.app

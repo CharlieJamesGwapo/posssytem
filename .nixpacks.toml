@@ -1,0 +1,11 @@
+[providers]
+nixpacks = "node-22"
+
+[build]
+cmds = [
+  "npm install",
+  "npm run build"
+]
+
+[start]
+cmd = "npm start"
