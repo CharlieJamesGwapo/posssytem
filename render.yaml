@@ -41,6 +41,6 @@ services:
         scope: build
         sync: false
       - key: NEXT_PUBLIC_APP_URL
-        value: https://g2possystem-production-c334.up.railway.app
+        value: https://your-app-name.onrender.com
       - key: NEXT_PUBLIC_BASE_URL
-        value: https://g2possystem-production-c334.up.railway.app
+        value: https://your-app-name.onrender.com

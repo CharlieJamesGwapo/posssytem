@@ -1,0 +1,34 @@
+{
+  "version": 2,
+  "name": "g2possystem",
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/next"
+    }
+  ],
+  "env": {
+    "DATABASE_URL": "@database_url",
+    "DIRECT_DATABASE_URL": "@direct_database_url",
+    "NODE_ENV": "production",
+    "NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME": "dtr1tnutd",
+    "CLOUDINARY_API_KEY": "@cloudinary_api_key",
+    "CLOUDINARY_API_SECRET": "@cloudinary_api_secret",
+    "NEXT_PUBLIC_GCASH_MERCHANT_ID": "your_merchant_id",
+    "GCASH_SECRET_KEY": "@gcash_secret_key",
+    "NEXT_PUBLIC_APP_URL": "https://your-app-name.vercel.app",
+    "NEXT_PUBLIC_BASE_URL": "https://your-app-name.vercel.app",
+    "NEXT_PUBLIC_QR_SCANNER_URL": "https://your-app-name.vercel.app/qr-scanner"
+  },
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    }
+  ],
+  "functions": {
+    "src/api/**/*.js": {
+      "runtime": "nodejs22.x"
+    }
+  }
+}

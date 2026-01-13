@@ -58,20 +58,20 @@ export const useCartStore = create<CartStore>((set, get) => ({
 
   removeItem: (id) =>
     set((state) => ({
-      items: state.items.filter((item) => item.id !== id),
+      items: state.items.filter((item) => item.id && item.id !== id),
     })),
 
   updateQuantity: (id, quantity) =>
     set((state) => ({
       items: state.items.map((item) =>
-        item.id === id ? { ...item, quantity: Math.max(1, quantity) } : item
+        item.id && item.id === id ? { ...item, quantity: Math.max(1, quantity) } : item
       ),
     })),
 
   addAddOn: (cartItemId, addOn) =>
     set((state) => ({
       items: state.items.map((item) =>
-        item.id === cartItemId
+        item.id && item.id === cartItemId
           ? {
               ...item,
               addOns: [...item.addOns, addOn],
@@ -83,10 +83,10 @@ export const useCartStore = create<CartStore>((set, get) => ({
   removeAddOn: (cartItemId, addOnId) =>
     set((state) => ({
       items: state.items.map((item) =>
-        item.id === cartItemId
+        item.id && item.id === cartItemId
           ? {
               ...item,
-              addOns: item.addOns.filter((ao) => ao.id !== addOnId),
+              addOns: item.addOns.filter((ao) => ao.id && ao.id !== addOnId),
             }
           : item
       ),
@@ -95,11 +95,11 @@ export const useCartStore = create<CartStore>((set, get) => ({
   updateAddOnQuantity: (cartItemId, addOnId, quantity) =>
     set((state) => ({
       items: state.items.map((item) =>
-        item.id === cartItemId
+        item.id && item.id === cartItemId
           ? {
               ...item,
               addOns: item.addOns.map((ao) =>
-                ao.id === addOnId ? { ...ao, quantity: Math.max(1, quantity) } : ao
+                ao.id && ao.id === addOnId ? { ...ao, quantity: Math.max(1, quantity) } : ao
               ),
             }
           : item

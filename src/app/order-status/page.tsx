@@ -191,7 +191,7 @@ function OrderStatusContent() {
     fetchOrder()
 
     // Auto-refresh every 3 seconds if order is not completed
-    let interval: NodeJS.Timeout
+    let interval: ReturnType<typeof setInterval>
     if (autoRefresh) {
       interval = setInterval(fetchOrder, 3000)
     }

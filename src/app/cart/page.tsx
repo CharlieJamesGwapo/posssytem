@@ -100,7 +100,7 @@ export default function CartPage() {
           {/* Items */}
           <div className="divide-y divide-gray-200">
             {items.map((item) => (
-              <div key={item.id} className="p-6 hover:bg-amber-50 transition-colors">
+              <div key={item.id || `item-${Math.random()}`} className="p-6 hover:bg-amber-50 transition-colors">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
                     <h3 className="font-bold text-lg text-gray-800">
@@ -181,7 +181,7 @@ export default function CartPage() {
                     <div className="space-y-2">
                       {item.addOns.map((addOn) => (
                         <div
-                          key={addOn.id}
+                          key={addOn.id || `addon-${Math.random()}`}
                           className="flex items-center justify-between text-sm"
                         >
                           <div className="flex-1">
