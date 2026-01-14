@@ -1,7 +1,6 @@
 {
   "version": 2,
   "name": "g2possystem",
-  "comment": "Fixed functions runtime issue",
   "env": {
     "DATABASE_URL": "${DATABASE_URL}",
     "DIRECT_DATABASE_URL": "${DIRECT_DATABASE_URL}",
