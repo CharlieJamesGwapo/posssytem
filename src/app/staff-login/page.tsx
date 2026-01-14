@@ -18,8 +18,22 @@ export default function StaffLoginPage() {
   // Check if already logged in
   useEffect(() => {
     const token = localStorage.getItem('staffToken')
-    if (token) {
-      router.push('/staff')
+    const name = localStorage.getItem('staffName')
+    
+    // Clear corrupted data if token exists but name doesn't
+    if (token && !name) {
+      console.log('Corrupted auth data found, clearing...')
+      localStorage.removeItem('staffToken')
+      localStorage.removeItem('staffName')
+      localStorage.removeItem('staffRole')
+      localStorage.removeItem('staffId')
+      return
+    }
+    
+    // Only redirect if we have both token and name, and we're not already on staff page
+    if (token && name && window.location.pathname === '/staff-login') {
+      console.log('User already logged in, redirecting to staff dashboard...')
+      router.replace('/staff')
     }
   }, [router])
 

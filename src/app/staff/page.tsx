@@ -62,8 +62,11 @@ export default function StaffDashboard() {
     const name = localStorage.getItem('staffName')
 
     if (!token) {
-      // Redirect to login
-      router.push('/staff-login')
+      console.log('No token found, redirecting to login...')
+      // Only redirect if we're not already on login page
+      if (window.location.pathname !== '/staff-login') {
+        router.replace('/staff-login')
+      }
       return
     }
 
