@@ -2,17 +2,17 @@
   "version": 2,
   "name": "g2possystem",
   "env": {
-    "DATABASE_URL": "@database_url",
-    "DIRECT_DATABASE_URL": "@direct_database_url",
+    "DATABASE_URL": "${DATABASE_URL}",
+    "DIRECT_DATABASE_URL": "${DIRECT_DATABASE_URL}",
     "NODE_ENV": "production",
     "NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME": "dtr1tnutd",
-    "CLOUDINARY_API_KEY": "@cloudinary_api_key",
-    "CLOUDINARY_API_SECRET": "@cloudinary_api_secret",
+    "CLOUDINARY_API_KEY": "${CLOUDINARY_API_KEY}",
+    "CLOUDINARY_API_SECRET": "${CLOUDINARY_API_SECRET}",
     "NEXT_PUBLIC_GCASH_MERCHANT_ID": "your_merchant_id",
-    "GCASH_SECRET_KEY": "@gcash_secret_key",
-    "NEXT_PUBLIC_APP_URL": "https://your-app-name.vercel.app",
-    "NEXT_PUBLIC_BASE_URL": "https://your-app-name.vercel.app",
-    "NEXT_PUBLIC_QR_SCANNER_URL": "https://your-app-name.vercel.app/qr-scanner"
+    "GCASH_SECRET_KEY": "${GCASH_SECRET_KEY}",
+    "NEXT_PUBLIC_APP_URL": "https://posssytem.vercel.app",
+    "NEXT_PUBLIC_BASE_URL": "https://posssytem.vercel.app",
+    "NEXT_PUBLIC_QR_SCANNER_URL": "https://posssytem.vercel.app/qr-scanner"
   },
   "routes": [
     {
