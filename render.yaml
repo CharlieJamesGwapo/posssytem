@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: g2possystem
+    name: posssytem
     env: node
     plan: free
     runtime: node-22
@@ -41,6 +41,8 @@ services:
         scope: build
         sync: false
       - key: NEXT_PUBLIC_APP_URL
-        value: https://your-app-name.onrender.com
+        value: https://posssytem.onrender.com
       - key: NEXT_PUBLIC_BASE_URL
-        value: https://your-app-name.onrender.com
+        value: https://posssytem.onrender.com
+      - key: NEXT_PUBLIC_QR_SCANNER_URL
+        value: https://posssytem.onrender.com/qr-scanner
