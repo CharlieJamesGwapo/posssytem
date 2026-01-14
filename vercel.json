@@ -19,10 +19,5 @@
       "src": "/api/(.*)",
       "dest": "/api/$1"
     }
-  ],
-  "functions": {
-    "src/api/**/*.js": {
-      "runtime": "nodejs22.x"
-    }
-  }
+  ]
 }
