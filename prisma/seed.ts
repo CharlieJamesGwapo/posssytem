@@ -28,6 +28,7 @@ async function main() {
     await prisma.order.deleteMany()
     await prisma.addOn.deleteMany()
     await prisma.menuItem.deleteMany()
+    await prisma.table.deleteMany()
 
     console.log('📝 Creating menu items with size pricing...')
 
