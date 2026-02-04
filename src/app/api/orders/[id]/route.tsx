@@ -49,6 +49,19 @@ export async function PATCH(
     const body = await request.json()
     const { status, paymentStatus } = body
 
+    // Get the current order to check if it's being completed
+    const currentOrder = await prisma.order.findUnique({
+      where: { id: params.id },
+      select: { tableNumber: true, status: true, paymentStatus: true }
+    })
+
+    if (!currentOrder) {
+      return NextResponse.json(
+        { error: 'Order not found' },
+        { status: 404 }
+      )
+    }
+
     const order = await prisma.order.update({
       where: { id: params.id },
       data: {
@@ -68,6 +81,19 @@ export async function PATCH(
         },
       },
     })
+
+    // If order is completed (status is COMPLETED and payment is PAID), clear the table
+    if (status === 'COMPLETED' && paymentStatus === 'PAID') {
+      try {
+        await prisma.table.update({
+          where: { tableNumber: currentOrder.tableNumber },
+          data: { status: 'AVAILABLE' }
+        })
+      } catch (error) {
+        console.error('Error clearing table:', error)
+        // Don't fail the order update if table clearing fails
+      }
+    }
 
     return NextResponse.json(order)
   } catch (error) {

@@ -4,7 +4,7 @@ import { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { ShoppingCart, Menu, X, Coffee, Lock, QrCode } from 'lucide-react'
+import { ShoppingCart, Menu, X, Coffee, QrCode } from 'lucide-react'
 import MenuCard from '@/components/MenuCard'
 import WelcomeScreen from '@/components/WelcomeScreen'
 import TableBlocker from '@/components/TableBlocker'
@@ -157,14 +157,6 @@ function HomeContent() {
               <span>Scan QR</span>
             </Link>
             <Link
-              href="/staff-login"
-              className="hidden sm:flex bg-black bg-opacity-20 hover:bg-opacity-30 text-white px-3 lg:px-4 py-2 rounded-lg transition-all transform hover:scale-105 items-center gap-2 font-semibold text-sm"
-              title="Staff Login"
-            >
-              <Lock size={18} />
-              <span>Staff</span>
-            </Link>
-            <Link
               href="/cart"
               className="relative bg-white hover:bg-gray-100 text-amber-600 px-3 sm:px-4 py-2 rounded-lg transition-all transform hover:scale-105 flex items-center gap-2 font-semibold text-sm shadow-md hover:shadow-lg"
             >
@@ -196,13 +188,6 @@ function HomeContent() {
             >
               <QrCode size={18} />
               <span>Scan QR Code</span>
-            </Link>
-            <Link
-              href="/staff-login"
-              className="w-full bg-black bg-opacity-20 hover:bg-opacity-30 text-white px-4 py-2.5 rounded-lg transition-all flex items-center gap-2 justify-center font-semibold text-sm"
-            >
-              <Lock size={18} />
-              <span>Staff Login</span>
             </Link>
             <Link
               href="/cart"
@@ -272,6 +257,16 @@ function HomeContent() {
           {filteredItems.map((item) => (
             <MenuCard key={item.id} {...item} />
           ))}
+        </div>
+
+        {/* Full Menu Link */}
+        <div className="text-center mb-8">
+          <Link
+            href="/full-menu"
+            className="inline-flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white px-6 py-3 rounded-lg transition-all transform hover:scale-105 font-semibold shadow-lg"
+          >
+            <span>📋 View Full Menu</span>
+          </Link>
         </div>
 
         {filteredItems.length === 0 && (

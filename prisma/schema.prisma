@@ -21,12 +21,17 @@ model MenuItem {
   ingredients String?    // JSON string of ingredients array
   allergens   String?    // JSON string of allergens array
   sizes       String?    // JSON string of available sizes with prices: [{"name":"Small","price":130},...]
+  isBestSeller Boolean   @default(false)
+  isAvailable Boolean   @default(true)
+  backgroundImage String? // For product template background
   addOns      AddOn[]
   orderItems  OrderItem[]
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 
   @@index([category])
+  @@index([isAvailable])
+  @@index([isBestSeller])
 }
 
 model AddOn {
@@ -44,11 +49,12 @@ model AddOn {
 
 model Order {
   id              String     @id @default(cuid())
+  orderNumber     Int        // Daily order sequence number
   tableNumber     Int
   branch          String     @default("Flitra Café")
-  status          OrderStatus @default(PENDING)
-  paymentStatus   PaymentStatus @default(UNPAID)
-  paymentMethod   PaymentMethod?
+  status          String     @default("PENDING") // PENDING, CONFIRMED, PREPARING, READY, COMPLETED, CANCELLED
+  paymentStatus   String     @default("UNPAID") // UNPAID, PAID, REFUNDED
+  paymentMethod   String?    // CASH, GCASH, PAYMAYA, CARD
   totalAmount     Float
   orderItems      OrderItem[]
   paymentCode     String?
@@ -60,6 +66,8 @@ model Order {
   @@index([paymentStatus])
   @@index([tableNumber])
   @@index([createdAt])
+  @@index([orderNumber])
+  @@unique([orderNumber, createdAt]) // Unique order number per day
 }
 
 model OrderItem {
@@ -91,28 +99,6 @@ model OrderAddOn {
 
   @@index([orderItemId])
   @@index([addOnId])
-}
-
-enum OrderStatus {
-  PENDING
-  CONFIRMED
-  PREPARING
-  READY
-  COMPLETED
-  CANCELLED
-}
-
-enum PaymentStatus {
-  UNPAID
-  PAID
-  REFUNDED
-}
-
-enum PaymentMethod {
-  CASH
-  GCASH
-  PAYMAYA
-  CARD
 }
 
 model Staff {

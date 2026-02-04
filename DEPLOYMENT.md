@@ -1,13 +1,298 @@
-# 🚀 Deployment Guide - Sit & Scan
+# 🚀 POS System Deployment Guide
 
-Complete guide to deploy your ordering system to production.
+## 📋 Overview
 
----
+This guide will help you deploy the Filtra Café POS System to production. The system is built with Next.js, Prisma, and PostgreSQL.
+
+## 🛠️ Quick Deployment Options
+
+### 🌐 Option 1: Vercel (Easiest - 5 minutes)
+```bash
+# Install Vercel CLI
+npm i -g vercel
+
+# Deploy
+npx vercel --prod
+```
+
+### 🐳 Option 2: Docker (Recommended for control)
+```bash
+# Build and run
+docker-compose up -d
+```
+
+### 🖥️ Option 3: Traditional Server
+```bash
+# Run deployment script
+./deploy.sh
+
+# Start with PM2
+pm2 start npm --name "pos-system" -- start
+```
+
+## 🔧 Environment Setup
+
+### 1. Database Configuration
+```bash
+# PostgreSQL (recommended)
+DATABASE_URL="postgresql://user:password@host:5432/pos_db?sslmode=require"
+DIRECT_DATABASE_URL="postgresql://user:password@host:5432/pos_db"
+```
+
+### 2. App Configuration
+```bash
+NEXT_PUBLIC_APP_URL="https://your-domain.com"
+NEXT_PUBLIC_BASE_URL="https://your-domain.com"
+NODE_ENV="production"
+```
+
+### 3. Optional Services
+```bash
+# Cloudinary (images)
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME="your_cloud_name"
+CLOUDINARY_API_KEY="your_api_key"
+CLOUDINARY_API_SECRET="your_api_secret"
+
+# GCash Payments
+NEXT_PUBLIC_GCASH_MERCHANT_ID="your_merchant_id"
+GCASH_SECRET_KEY="your_secret_key"
+```
+
+## 🚀 Deployment Steps
+
+### Step 1: Prepare Environment
+```bash
+# Install dependencies
+npm install
+
+# Generate Prisma client
+npx prisma generate
+
+# Build application
+npm run build
+```
+
+### Step 2: Database Setup
+```bash
+# Push schema to production
+npx prisma db push
+
+# Seed with initial data
+npm run db:seed
+```
+
+### Step 3: Start Production Server
+```bash
+# Start the application
+npm start
+```
+
+## 🐳 Docker Deployment
+
+### Using Docker Compose (Recommended)
+```bash
+# Start all services
+docker-compose up -d
+
+# Check status
+docker-compose ps
+
+# View logs
+docker-compose logs -f
+```
+
+### Manual Docker Build
+```bash
+# Build image
+docker build -t pos-system .
+
+# Run container
+docker run -p 3000:3000 --env-file .env.production pos-system
+```
+
+## 🌐 Vercel Deployment
+
+### Automatic Deployment
+```bash
+# Connect to Vercel
+npx vercel
+
+# Deploy to production
+npx vercel --prod
+```
+
+### Environment Variables in Vercel
+1. Go to Vercel Dashboard → Project Settings
+2. Add all environment variables from `.env.production.example`
+3. Redeploy
+
+## 🖥️ Server Deployment
+
+### Using PM2 (Process Manager)
+```bash
+# Install PM2
+npm install -g pm2
+
+# Start application
+pm2 start npm --name "pos-system" -- start
+
+# Save PM2 configuration
+pm2 save
+
+# Setup startup script
+pm2 startup
+```
+
+### Nginx Configuration
+```nginx
+server {
+    listen 80;
+    server_name your-domain.com;
+    return 301 https://$server_name$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    server_name your-domain.com;
+
+    ssl_certificate /etc/letsencrypt/live/your-domain.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/your-domain.com/privkey.pem;
+
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+```
+
+## 🔍 Health Checks
+
+### Application Endpoints
+- **Health Check:** `GET /api/health`
+- **Database Test:** `GET /api/test-db`
+- **Menu API:** `GET /api/menu`
+
+### Monitoring Commands
+```bash
+# PM2 monitoring
+pm2 monit
+
+# Docker logs
+docker-compose logs -f app
+
+# System resources
+htop
+```
+
+## 🚨 Troubleshooting
+
+### Common Issues
+
+1. **Database Connection Error**
+   ```bash
+   # Test database connection
+   npx prisma db pull
+   
+   # Check environment variables
+   echo $DATABASE_URL
+   ```
+
+2. **Build Fails**
+   ```bash
+   # Clear cache and rebuild
+   rm -rf .next node_modules
+   npm install
+   npm run build
+   ```
+
+3. **Redirect Loop**
+   ```bash
+   # Clear browser data
+   # Check middleware configuration
+   # Verify authentication logic
+   ```
+
+### Performance Optimization
+
+1. **Enable Caching**
+   ```bash
+   # Next.js caching
+   npm run build
+   ```
+
+2. **Database Indexes**
+   ```sql
+   -- These are already included in schema
+   -- Verify they exist in production
+   \d+ orders
+   ```
 
 ## 📋 Pre-Deployment Checklist
 
-- [ ] All environment variables configured
-- [ ] Database migrated and tested
+- [ ] PostgreSQL database created
+- [ ] Environment variables configured
+- [ ] SSL certificate installed
+- [ ] Domain DNS configured
+- [ ] Firewall ports open (80, 443)
+- [ ] Backup strategy planned
+- [ ] Monitoring setup
+- [ ] Error logging configured
+
+## 🎯 Post-Deployment Testing
+
+### Essential Tests
+1. **Customer Flow**
+   - Browse menu → Add to cart → Checkout → Payment
+
+2. **Staff Flow**
+   - Login → View orders → Update status → Manage tables
+
+3. **QR Code Ordering**
+   - Scan QR → Select table → Place order
+
+4. **Mobile Responsiveness**
+   - Test on phone/tablet
+
+### Performance Checks
+- Page load time < 3 seconds
+- API response time < 500ms
+- Database queries optimized
+
+## 🔄 Maintenance
+
+### Regular Tasks
+```bash
+# Update dependencies
+npm update
+
+# Database backup
+pg_dump pos_db > backup_$(date +%Y%m%d).sql
+
+# Log rotation
+pm2 logs pos-system --lines 1000
+```
+
+### Monitoring Setup
+- Uptime monitoring (UptimeRobot)
+- Error tracking (Sentry)
+- Performance monitoring (New Relic)
+
+## 🎉 Deployment Complete!
+
+Your POS system is now live! Access it at:
+- **Customer Interface:** `https://your-domain.com`
+- **Staff Login:** `https://your-domain.com/staff-login`
+- **Staff Dashboard:** `https://your-domain.com/staff`
+
+**Default Staff Credentials:**
+- Username: `admin`
+- Password: `admin123`
+
+🎉 **Ready for business!**
 - [ ] Menu items added and verified
 - [ ] Payment methods configured
 - [ ] Images uploaded to Cloudinary (if using)

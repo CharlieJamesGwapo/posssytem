@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     })
 
     // Transform the data to match the expected format
-    const formattedItems = menuItems.map((item) => ({
+    const formattedItems = menuItems.map((item: any) => ({
       id: item.id,
       name: item.name,
       description: item.description,
@@ -25,7 +25,10 @@ export async function GET(request: NextRequest) {
       ingredients: item.ingredients,
       allergens: item.allergens,
       sizes: item.sizes,
-      addOns: item.addOns.map((ao) => ({
+      isBestSeller: item.isBestSeller || false,
+      isAvailable: item.isAvailable !== false,
+      backgroundImage: item.backgroundImage,
+      addOns: item.addOns.map((ao: any) => ({
         id: ao.id,
         name: ao.name,
         price: ao.price,

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 export function middleware(request: NextRequest) {
-  // Temporarily disable all middleware to fix redirect loop
+  // Temporarily disable middleware to fix redirect loop
   return NextResponse.next()
 }
 

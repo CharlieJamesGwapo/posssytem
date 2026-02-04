@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { ShoppingCart } from 'lucide-react'
+import { ShoppingCart, Star } from 'lucide-react'
 import { useState } from 'react'
 import ItemModal from './ItemModal'
 
@@ -13,6 +13,8 @@ interface MenuCardProps {
   image?: string
   category: string
   addOns: any[]
+  isBestSeller?: boolean
+  isAvailable?: boolean
 }
 
 export default function MenuCard({
@@ -23,6 +25,8 @@ export default function MenuCard({
   image,
   category,
   addOns,
+  isBestSeller = false,
+  isAvailable = true,
 }: MenuCardProps) {
   const [showModal, setShowModal] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -37,15 +41,19 @@ export default function MenuCard({
 
   return (
     <>
-      <div className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden h-full flex flex-col hover:border-amber-600 border-2 border-transparent">
+      <div className={`bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden h-full flex flex-col hover:border-amber-600 border-2 border-transparent ${
+        !isAvailable ? 'opacity-60 grayscale' : ''
+      }`}>
         {/* Image Container - Professional sizing */}
-        <div className="relative w-full h-40 sm:h-44 md:h-40 lg:h-44 bg-gray-200 overflow-hidden group cursor-pointer" onClick={handleAddClick}>
+        <div className={`relative w-full h-40 sm:h-44 md:h-40 lg:h-44 bg-gray-200 overflow-hidden group cursor-pointer ${
+          !isAvailable ? 'cursor-not-allowed' : ''
+        }`} onClick={isAvailable ? handleAddClick : undefined}>
           {image ? (
             <Image
               src={image}
               alt={name}
               fill
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
+              className={`object-cover transition-transform duration-300 ${isAvailable ? 'group-hover:scale-105' : ''}`}
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
               priority={false}
               quality={75}
@@ -60,6 +68,23 @@ export default function MenuCard({
           <div className="absolute top-2 right-2 bg-amber-600 text-white px-2.5 py-1 rounded-full text-xs font-bold shadow-md">
             {category}
           </div>
+
+          {/* Best Seller Badge */}
+          {isBestSeller && (
+            <div className="absolute top-2 left-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-2.5 py-1 rounded-full text-xs font-bold shadow-md flex items-center gap-1">
+              <Star size={10} className="fill-current" />
+              Best Seller
+            </div>
+          )}
+
+          {/* Out of Stock Overlay */}
+          {!isAvailable && (
+            <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+              <div className="bg-red-600 text-white px-4 py-2 rounded-lg font-bold text-sm">
+                Out of Stock
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Content Container */}
@@ -84,16 +109,20 @@ export default function MenuCard({
 
             <button
               onClick={handleAddClick}
-              disabled={isLoading}
-              className="flex items-center justify-center gap-1.5 px-3 sm:px-4 py-2 rounded-lg font-semibold transition-all duration-200 transform active:scale-95 bg-amber-600 hover:bg-amber-700 text-white shadow-md hover:shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed text-sm sm:text-base"
-              aria-label="Add to cart"
+              disabled={isLoading || !isAvailable}
+              className={`flex items-center justify-center gap-1.5 px-3 sm:px-4 py-2 rounded-lg font-semibold transition-all duration-200 transform active:scale-95 shadow-md hover:shadow-lg text-sm sm:text-base ${
+                !isAvailable 
+                  ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
+                  : 'bg-amber-600 hover:bg-amber-700 text-white disabled:bg-gray-400 disabled:cursor-not-allowed'
+              }`}
+              aria-label={isAvailable ? "Add to cart" : "Out of stock"}
             >
               {isLoading ? (
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
               ) : (
                 <>
                   <ShoppingCart size={16} className="sm:block" />
-                  <span className="hidden sm:inline">Add</span>
+                  <span className="hidden sm:inline">{isAvailable ? 'Add' : 'Unavailable'}</span>
                 </>
               )}
             </button>
@@ -102,7 +131,7 @@ export default function MenuCard({
       </div>
 
       {/* Item Modal */}
-      {showModal && (
+      {showModal && isAvailable && (
         <ItemModal
           item={{
             id,

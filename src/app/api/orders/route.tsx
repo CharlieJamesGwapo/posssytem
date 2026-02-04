@@ -7,6 +7,30 @@ function generatePaymentCode(): string {
   return Math.random().toString(36).substring(2, 8).toUpperCase()
 }
 
+async function generateOrderNumber(): Promise<number> {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  
+  // Get the highest order number for today
+  const lastOrder = await prisma.order.findFirst({
+    where: {
+      createdAt: {
+        gte: today,
+      },
+    },
+    orderBy: {
+      orderNumber: 'desc',
+    },
+    select: {
+      orderNumber: true,
+    },
+  })
+  
+  // If no orders today, start with 1
+  // Otherwise, increment by 1
+  return lastOrder ? lastOrder.orderNumber + 1 : 1
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
@@ -56,9 +80,11 @@ export async function POST(request: NextRequest) {
 
     // Create order
     const paymentCode = paymentMethod === 'CASH' ? generatePaymentCode() : null
+    const orderNumber = await generateOrderNumber()
 
     const order = await prisma.order.create({
       data: {
+        orderNumber,
         tableNumber,
         totalAmount,
         paymentMethod,

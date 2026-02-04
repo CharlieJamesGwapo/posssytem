@@ -13,6 +13,16 @@ node_modules/
 # Production
 /build
 
+# Database
+*.db
+*.sqlite
+dev.db
+
+# Environment variables
+.env
+.env.local
+.env.production
+
 # Misc
 .DS_Store
 *.pem

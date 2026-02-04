@@ -3,9 +3,10 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Coffee, CheckCircle, Clock, AlertCircle, LogOut, Menu, X, RefreshCw, QrCode, Home, ChevronDown } from 'lucide-react'
+import { Coffee, CheckCircle, Clock, AlertCircle, LogOut, Menu, X, RefreshCw, QrCode, Home, ChevronDown, Package } from 'lucide-react'
 import { showSuccessAlert, showErrorAlert } from '@/utils'
 import TableStatusPanel from '@/components/TableStatusPanel'
+import ProductTemplateManager from '@/components/ProductTemplateManager'
 
 interface Table {
   id: string
@@ -55,6 +56,7 @@ export default function StaffDashboard() {
   const [authenticated, setAuthenticated] = useState(false)
   const [showTableManager, setShowTableManager] = useState(false)
   const [tableManagerLoading, setTableManagerLoading] = useState(false)
+  const [activeTab, setActiveTab] = useState('orders')
 
   useEffect(() => {
     // Check authentication on client side only
@@ -63,10 +65,7 @@ export default function StaffDashboard() {
 
     if (!token) {
       console.log('No token found, redirecting to login...')
-      // Only redirect if we're not already on login page
-      if (window.location.pathname !== '/staff-login') {
-        router.replace('/staff-login')
-      }
+      router.replace('/staff-login')
       return
     }
 
@@ -437,6 +436,18 @@ export default function StaffDashboard() {
                 <Coffee className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
 
+              <button
+                onClick={() => setActiveTab('products')}
+                className={`p-2 rounded-lg transition-all ${
+                  activeTab === 'products' 
+                    ? 'bg-white bg-opacity-30 text-white' 
+                    : 'bg-white bg-opacity-20 hover:bg-opacity-30 text-white'
+                }`}
+                title="Manage products"
+              >
+                <Package className="w-4 h-4 sm:w-5 sm:h-5" />
+              </button>
+
               <Link
                 href="/staff-table-status"
                 className="p-2 rounded-lg bg-white bg-opacity-20 hover:bg-opacity-30 text-white transition-all"
@@ -524,148 +535,154 @@ export default function StaffDashboard() {
 
       {/* Orders Grid */}
       <main className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6 pb-20 sm:pb-8">
-        {/* Table Status Panel */}
-        <div className="mb-8 sm:mb-10">
-          <TableStatusPanel />
-        </div>
-
-        {/* Orders Section Header */}
-        <div className="mb-6 sm:mb-8">
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center gap-2">
-            <Coffee className="text-amber-600" size={28} />
-            Active Orders
-          </h2>
-          <p className="text-sm text-gray-600 mt-1">
-            {filteredOrders.length} order{filteredOrders.length !== 1 ? 's' : ''} to process
-          </p>
-        </div>
-
-        {filteredOrders.length === 0 ? (
-          <div className="bg-white rounded-xl shadow-md p-6 sm:p-8 text-center">
-            <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-base sm:text-lg text-gray-600">No orders to display</p>
-            <p className="text-sm text-gray-500 mt-2">Waiting for customers to place orders...</p>
-          </div>
+        {activeTab === 'products' ? (
+          <ProductTemplateManager />
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
-            {filteredOrders.map((order) => (
-              <div
-                key={order.id}
-                className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col border-l-4 border-amber-600"
-              >
-                {/* Order Header */}
-                <div className="bg-gradient-to-r from-amber-600 to-orange-600 text-white p-4 sm:p-5">
-                  <div className="flex items-center justify-between mb-3">
-                    <div>
-                      <h3 className="text-lg sm:text-xl font-bold">🪑 Table {order.tableNumber}</h3>
-                      <p className="text-xs sm:text-sm text-amber-100 mt-1">
-                        ⏰ {new Date(order.createdAt).toLocaleTimeString()}
-                      </p>
-                    </div>
-                    <span className="bg-white bg-opacity-20 px-3 py-1 rounded-full font-mono text-xs sm:text-sm font-semibold">
-                      #{order.id.slice(0, 8)}
-                    </span>
-                  </div>
-                </div>
+          <>
+            {/* Table Status Panel */}
+            <div className="mb-8 sm:mb-10">
+              <TableStatusPanel />
+            </div>
 
-                {/* Order Items */}
-                <div className="p-4 sm:p-5 border-b border-gray-200 max-h-48 overflow-y-auto flex-grow bg-gray-50">
-                  <h4 className="font-bold text-gray-900 mb-3 text-sm sm:text-base">📋 Items:</h4>
-                  <div className="space-y-2">
-                    {order.orderItems.map((item) => (
-                      <div key={item.id} className="text-xs sm:text-sm bg-white p-2 rounded border border-gray-200">
-                        <p className="font-semibold text-gray-900">
-                          {item.quantity}x {item.menuItem.name}
-                        </p>
-                        {item.addOns.length > 0 && (
-                          <ul className="ml-3 text-gray-600 text-xs mt-1">
-                            {item.addOns.map((addOn) => (
-                              <li key={addOn.id} className="text-gray-500">
-                                • {addOn.quantity}x {addOn.addOn.name}
-                              </li>
-                            ))}
-                          </ul>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
+            {/* Orders Section Header */}
+            <div className="mb-6 sm:mb-8">
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center gap-2">
+                <Coffee className="text-amber-600" size={28} />
+                Active Orders
+              </h2>
+              <p className="text-sm text-gray-600 mt-1">
+                {filteredOrders.length} order{filteredOrders.length !== 1 ? 's' : ''} to process
+              </p>
+            </div>
 
-                {/* Status and Payment */}
-                <div className="p-4 sm:p-5 space-y-4">
-                  {/* Order Status */}
-                  <div>
-                    <p className="text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">👨‍🍳 Order Status</p>
-                    <div className="flex gap-2 flex-wrap">
-                      {['CONFIRMED', 'PREPARING', 'READY'].map((status) => (
-                        <button
-                          key={status}
-                          onClick={() => handleStatusChange(order.id, status)}
-                          className={`text-xs sm:text-sm font-bold px-3 py-2 rounded-lg transition-all transform hover:scale-105 ${
-                            order.status === status
-                              ? statusColors[status] + ' shadow-md'
-                              : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
-                          }`}
-                        >
-                          {status === 'CONFIRMED' ? '✓' : status === 'PREPARING' ? '👨‍🍳' : '✅'} {status}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Payment Status */}
-                  <div>
-                    <p className="text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">💳 Payment</p>
-                    <div className="flex items-center justify-between gap-2">
-                      <span
-                        className={`text-xs sm:text-sm font-bold px-3 py-2 rounded-lg ${
-                          paymentColors[order.paymentStatus]
-                        }`}
-                      >
-                        {order.paymentStatus}
-                      </span>
-                      {order.paymentStatus === 'UNPAID' && (
-                        <button
-                          onClick={() => handlePaymentConfirm(order.id)}
-                          className="text-xs sm:text-sm bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-lg transition-all transform hover:scale-105 font-bold"
-                        >
-                          ✓ Confirm
-                        </button>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Notify Customer Button */}
-                  <div>
-                    <p className="text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">🔔 Customer Notification</p>
-                    <button
-                      onClick={() => notifyCustomer(order.id, order.tableNumber, order.status)}
-                      className="w-full text-xs sm:text-sm bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-3 py-2 rounded-lg transition-all transform hover:scale-105 font-bold shadow-md"
-                    >
-                      🔔 Notify Table {order.tableNumber}
-                    </button>
-                  </div>
-
-                  {/* Payment Code */}
-                  {order.paymentCode && (
-                    <div className="bg-amber-50 rounded-lg p-3 text-center border-2 border-amber-200">
-                      <p className="text-xs text-gray-600 font-bold mb-1">💰 Payment Code</p>
-                      <p className="text-lg sm:text-xl font-bold text-amber-600 font-mono">
-                        {order.paymentCode}
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Total */}
-                  <div className="border-t-2 border-gray-200 pt-3">
-                    <p className="text-sm sm:text-base font-bold text-gray-900">
-                      💵 Total: <span className="text-amber-600 text-lg">₱{order.totalAmount.toFixed(2)}</span>
-                    </p>
-                  </div>
-                </div>
+            {filteredOrders.length === 0 ? (
+              <div className="bg-white rounded-xl shadow-md p-6 sm:p-8 text-center">
+                <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-base sm:text-lg text-gray-600">No orders to display</p>
+                <p className="text-sm text-gray-500 mt-2">Waiting for customers to place orders...</p>
               </div>
-            ))}
-          </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
+                {filteredOrders.map((order) => (
+                  <div
+                    key={order.id}
+                    className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col border-l-4 border-amber-600"
+                  >
+                    {/* Order Header */}
+                    <div className="bg-gradient-to-r from-amber-600 to-orange-600 text-white p-4 sm:p-5">
+                      <div className="flex items-center justify-between mb-3">
+                        <div>
+                          <h3 className="text-lg sm:text-xl font-bold">🪑 Table {order.tableNumber}</h3>
+                          <p className="text-xs sm:text-sm text-amber-100 mt-1">
+                            ⏰ {new Date(order.createdAt).toLocaleTimeString()}
+                          </p>
+                        </div>
+                        <span className="bg-white bg-opacity-20 px-3 py-1 rounded-full font-mono text-xs sm:text-sm font-semibold">
+                          #{order.id.slice(0, 8)}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Order Items */}
+                    <div className="p-4 sm:p-5 border-b border-gray-200 max-h-48 overflow-y-auto flex-grow bg-gray-50">
+                      <h4 className="font-bold text-gray-900 mb-3 text-sm sm:text-base">📋 Items:</h4>
+                      <div className="space-y-2">
+                        {order.orderItems.map((item) => (
+                          <div key={item.id} className="text-xs sm:text-sm bg-white p-2 rounded border border-gray-200">
+                            <p className="font-semibold text-gray-900">
+                              {item.quantity}x {item.menuItem.name}
+                            </p>
+                            {item.addOns.length > 0 && (
+                              <ul className="ml-3 text-gray-600 text-xs mt-1">
+                                {item.addOns.map((addOn) => (
+                                  <li key={addOn.id} className="text-gray-500">
+                                    • {addOn.quantity}x {addOn.addOn.name}
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Status and Payment */}
+                    <div className="p-4 sm:p-5 space-y-4">
+                      {/* Order Status */}
+                      <div>
+                        <p className="text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">👨‍🍳 Order Status</p>
+                        <div className="flex gap-2 flex-wrap">
+                          {['CONFIRMED', 'PREPARING', 'READY'].map((status) => (
+                            <button
+                              key={status}
+                              onClick={() => handleStatusChange(order.id, status)}
+                              className={`text-xs sm:text-sm font-bold px-3 py-2 rounded-lg transition-all transform hover:scale-105 ${
+                                order.status === status
+                                  ? statusColors[status] + ' shadow-md'
+                                  : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+                              }`}
+                            >
+                              {status === 'CONFIRMED' ? '✓' : status === 'PREPARING' ? '👨‍🍳' : '✅'} {status}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Payment Status */}
+                      <div>
+                        <p className="text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">💳 Payment</p>
+                        <div className="flex items-center justify-between gap-2">
+                          <span
+                            className={`text-xs sm:text-sm font-bold px-3 py-2 rounded-lg ${
+                              paymentColors[order.paymentStatus]
+                            }`}
+                          >
+                            {order.paymentStatus}
+                          </span>
+                          {order.paymentStatus === 'UNPAID' && (
+                            <button
+                              onClick={() => handlePaymentConfirm(order.id)}
+                              className="text-xs sm:text-sm bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-lg transition-all transform hover:scale-105 font-bold"
+                            >
+                              ✓ Confirm
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Notify Customer Button */}
+                      <div>
+                        <p className="text-xs font-bold text-gray-700 mb-2 uppercase tracking-wide">🔔 Customer Notification</p>
+                        <button
+                          onClick={() => notifyCustomer(order.id, order.tableNumber, order.status)}
+                          className="w-full text-xs sm:text-sm bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-3 py-2 rounded-lg transition-all transform hover:scale-105 font-bold shadow-md"
+                        >
+                          🔔 Notify Table {order.tableNumber}
+                        </button>
+                      </div>
+
+                      {/* Payment Code */}
+                      {order.paymentCode && (
+                        <div className="bg-amber-50 rounded-lg p-3 text-center border-2 border-amber-200">
+                          <p className="text-xs text-gray-600 font-bold mb-1">💰 Payment Code</p>
+                          <p className="text-lg sm:text-xl font-bold text-amber-600 font-mono">
+                            {order.paymentCode}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Total */}
+                      <div className="border-t-2 border-gray-200 pt-3">
+                        <p className="text-sm sm:text-base font-bold text-gray-900">
+                          💵 Total: <span className="text-amber-600 text-lg">₱{order.totalAmount.toFixed(2)}</span>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
         )}
       </main>
 

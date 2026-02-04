@@ -30,12 +30,9 @@ export default function StaffLoginPage() {
       return
     }
     
-    // Only redirect if we have both token and name, and we're not already on staff page
-    if (token && name && window.location.pathname === '/staff-login') {
-      console.log('User already logged in, redirecting to staff dashboard...')
-      router.replace('/staff')
-    }
-  }, [router])
+    // Only redirect if we have both token and name, but don't auto-redirect to avoid loops
+    // User can manually navigate to /staff if already logged in
+  }, [])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()

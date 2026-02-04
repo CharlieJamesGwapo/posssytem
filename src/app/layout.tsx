@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import NotificationSystem from '@/components/NotificationSystem'
 
 export const metadata: Metadata = {
   title: 'Filtra Café | Smart Ordering System - 2025 Group 2 SIT',
@@ -30,6 +31,7 @@ export default function RootLayout({
       </head>
       <body className="bg-gradient-to-br from-amber-50 to-orange-50 antialiased">
         {children}
+        <NotificationSystem />
         <footer className="fixed bottom-0 left-0 right-0 text-center text-xs text-gray-600 bg-white/50 backdrop-blur-sm py-1 border-t border-gray-200/50 z-10 pointer-events-none">
           © 2025 Filtra Café Smart Ordering System • Made by Group 2 SIT
         </footer>
